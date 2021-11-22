@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import './App.scss';
 
+// eslint-disable-next-line no-unused-vars
+const projectName = 'drum-machine';
+
+// coded by @no-stack-dub-sack (github) / @no_stack_sub_sack (codepen)
+
 const bankOne = [
   {
     keyCode: 81,
@@ -58,92 +63,311 @@ const bankOne = [
   }
 ];
 
-const data = [
-  { id: 'snare', letter: 'Q', src: 'https://www.myinstants.com/media/sounds/snare.mp3' },
-  { id: 'bass 1', letter: 'W', src: 'https://www.myinstants.com/media/sounds/bass-drum.mp3' },
-  { id: 'bongo', letter: 'E', src: 'http://tipiwiki.free.fr/snd/Percussion(4e)2.wav' },
-  { id: 'tom tom', letter: 'A', src: 'http://www.denhaku.com/r_box/sr16/sr16tom/loelectm.wav' },
-  { id: 'bass 3', letter: 'S', src: 'http://billor.chsh.chc.edu.tw/sound/bass4.wav' },
-  { id: 'shotgun', letter: 'D', src: 'http://david.guerrero.free.fr/Effects/ShotgunReload.wav' },
-  { id: 'high hat', letter: 'Z', src: 'http://www.denhaku.com/r_box/tr707/closed.wav' },
-  { id: 'drum hit', letter: 'X', src: 'http://www.masterbits.de/sc_docu/sounds1/1TM00013.MP3' },
-  { id: 'laser', letter: 'C', src: 'http://www.sa-matra.net/sounds/starcontrol/Umgah-Backzip.wav'  },
-]
-
-
-class DrumPad extends Component {
-  
-  handleClick =() => { 
-    this.audio.play()
-    this.audio.currentTime = 0
-    // this.props.handleDisplay(this.props.id)
+const bankTwo = [
+  {
+    keyCode: 81,
+    keyTrigger: 'Q',
+    id: 'Chord-1',
+    url: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_1.mp3'
+  },
+  {
+    keyCode: 87,
+    keyTrigger: 'W',
+    id: 'Chord-2',
+    url: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_2.mp3'
+  },
+  {
+    keyCode: 69,
+    keyTrigger: 'E',
+    id: 'Chord-3',
+    url: 'https://s3.amazonaws.com/freecodecamp/drums/Chord_3.mp3'
+  },
+  {
+    keyCode: 65,
+    keyTrigger: 'A',
+    id: 'Shaker',
+    url: 'https://s3.amazonaws.com/freecodecamp/drums/Give_us_a_light.mp3'
+  },
+  {
+    keyCode: 83,
+    keyTrigger: 'S',
+    id: 'Open-HH',
+    url: 'https://s3.amazonaws.com/freecodecamp/drums/Dry_Ohh.mp3'
+  },
+  {
+    keyCode: 68,
+    keyTrigger: 'D',
+    id: 'Closed-HH',
+    url: 'https://s3.amazonaws.com/freecodecamp/drums/Bld_H1.mp3'
+  },
+  {
+    keyCode: 90,
+    keyTrigger: 'Z',
+    id: 'Punchy-Kick',
+    url: 'https://s3.amazonaws.com/freecodecamp/drums/punchy_kick_1.mp3'
+  },
+  {
+    keyCode: 88,
+    keyTrigger: 'X',
+    id: 'Side-Stick',
+    url: 'https://s3.amazonaws.com/freecodecamp/drums/side_stick_1.mp3'
+  },
+  {
+    keyCode: 67,
+    keyTrigger: 'C',
+    id: 'Snare',
+    url: 'https://s3.amazonaws.com/freecodecamp/drums/Brk_Snr.mp3'
   }
-  
+];
+
+const activeStyle = {
+  backgroundColor: 'orange',
+  boxShadow: '0 3px orange',
+  height: 77,
+  marginTop: 13
+};
+
+const inactiveStyle = {
+  backgroundColor: 'grey',
+  marginTop: 10,
+  boxShadow: '3px 3px 5px black'
+};
+
+class DrumPad extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      padStyle: inactiveStyle
+    };
+    this.playSound = this.playSound.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.activatePad = this.activatePad.bind(this);
+  }
   componentDidMount() {
-    document.addEventListener('keydown', this.handleKeydown)
-    window.focus()
+    document.addEventListener('keydown', this.handleKeyPress);
   }
-  
-   componentWillUnmount() {
-     document.removeEventListener('keydown', this.handleKeydown)
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyPress);
   }
-
-  handleKeydown= e => {
-    if(e.keyCode === this.props.letter.charCodeAt()) {
-      this.audio.play()
-      this.audio.currentTime = 0
-      // this.props.handleDisplay(this.props.id)
+  handleKeyPress(e) {
+    if (e.keyCode === this.props.keyCode) {
+      this.playSound();
     }
   }
-
-
-  render(){
-    return (
-        <div className='drum-pad' id={this.props.id} onClick={this.handleClick}>
-          <button>{this.props.letter}<br/>{this.props.id}</button>
-          <audio id={this.props.letter}
-               className='clip'
-               src={this.props.src}
-               ref={ref => this.audio = ref}
-          ></audio>
-        </div>
-    )
-  }
-}
-
-
-
-class App extends Component {
-  constructor(props){
-    super(props)
-
-    this.state ={
-      display:'Drum Machine',
-
+  activatePad() {
+    if (this.props.power) {
+      if (this.state.padStyle.backgroundColor === 'orange') {
+        this.setState({
+          padStyle: inactiveStyle
+        });
+      } else {
+        this.setState({
+          padStyle: activeStyle
+        });
+      }
+    } else if (this.state.padStyle.marginTop === 13) {
+      this.setState({
+        padStyle: inactiveStyle
+      });
+    } else {
+      this.setState({
+        padStyle: {
+          height: 77,
+          marginTop: 13,
+          backgroundColor: 'grey',
+          boxShadow: '0 3px grey'
+        }
+      });
     }
   }
-
- 
-  handleDisplay = display => this.setState({ display })
- 
+  playSound() {
+    const sound = document.getElementById(this.props.keyTrigger);
+    sound.currentTime = 0;
+    sound.play();
+    this.activatePad();
+    setTimeout(() => this.activatePad(), 100);
+    this.props.updateDisplay(this.props.clipId.replace(/-/g, ' '));
+  }
   render() {
     return (
-      <div className="container">
-        <div id="drum-machine">
-        <div id="display">{this.state.display}</div>
-        <div id='drum-pads'>{data.map(d => (
-          <DrumPad
-            key={d.id}
-            id={d.id}
-            letter={d.letter}
-            src={d.src}
-            // handleDisplay={this.handleDisplay}
-          />   
-         ))}</div>
+      <div
+        className='drum-pad'
+        id={this.props.clipId}
+        onClick={this.playSound}
+        style={this.state.padStyle}
+        >
+        <audio
+          className='clip'
+          id={this.props.keyTrigger}
+          src={this.props.clip}
+        />
+        {this.props.keyTrigger}
       </div>
-    </div>
     );
   }
 }
 
-export default App;
+class PadBank extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    let padBank;
+    if (this.props.power) {
+      padBank = this.props.currentPadBank.map((drumObj, i, padBankArr) => {
+        return (
+          <DrumPad
+            clip={padBankArr[i].url}
+            clipId={padBankArr[i].id}
+            keyCode={padBankArr[i].keyCode}
+            keyTrigger={padBankArr[i].keyTrigger}
+            power={this.props.power}
+            updateDisplay={this.props.updateDisplay}
+          />
+        );
+      });
+    } else {
+      padBank = this.props.currentPadBank.map((drumObj, i, padBankArr) => {
+        return (
+          <DrumPad
+            clip='#'
+            clipId={padBankArr[i].id}
+            keyCode={padBankArr[i].keyCode}
+            keyTrigger={padBankArr[i].keyTrigger}
+            power={this.props.power}
+            updateDisplay={this.props.updateDisplay}
+          />
+        );
+      });
+    }
+    return <div className='pad-bank'>{padBank}</div>;
+  }
+}
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      power: true,
+      display: String.fromCharCode(160),
+      currentPadBank: bankOne,
+      currentPadBankId: 'Heater Kit',
+      sliderVal: 0.3
+    };
+    this.displayClipName = this.displayClipName.bind(this);
+    this.selectBank = this.selectBank.bind(this);
+    this.adjustVolume = this.adjustVolume.bind(this);
+    this.powerControl = this.powerControl.bind(this);
+    this.clearDisplay = this.clearDisplay.bind(this);
+  }
+  powerControl() {
+    this.setState({
+      power: !this.state.power,
+      display: String.fromCharCode(160)
+    });
+  }
+  selectBank() {
+    if (this.state.power) {
+      if (this.state.currentPadBankId === 'Heater Kit') {
+        this.setState({
+          currentPadBank: bankTwo,
+          display: 'Smooth Piano Kit',
+          currentPadBankId: 'Smooth Piano Kit'
+        });
+      } else {
+        this.setState({
+          currentPadBank: bankOne,
+          display: 'Heater Kit',
+          currentPadBankId: 'Heater Kit'
+        });
+      }
+    }
+  }
+  displayClipName(name) {
+    if (this.state.power) {
+      this.setState({
+        display: name
+      });
+    }
+  }
+  adjustVolume(e) {
+    if (this.state.power) {
+      this.setState({
+        sliderVal: e.target.value,
+        display: 'Volume: ' + Math.round(e.target.value * 100)
+      });
+      setTimeout(() => this.clearDisplay(), 1000);
+    }
+  }
+  clearDisplay() {
+    this.setState({
+      display: String.fromCharCode(160)
+    });
+  }
+  render() {
+    const powerSlider = this.state.power
+      ? {
+          float: 'right'
+        }
+      : {
+          float: 'left'
+        };
+    const bankSlider =
+      this.state.currentPadBank === bankOne
+        ? {
+            float: 'left'
+          }
+        : {
+            float: 'right'
+          };
+    {
+      const clips = [].slice.call(document.getElementsByClassName('clip'));
+      clips.forEach(sound => {
+        sound.volume = this.state.sliderVal;
+      });
+    }
+    return (
+      <div className='inner-container' id='drum-machine'>
+        <PadBank
+          clipVolume={this.state.sliderVal}
+          currentPadBank={this.state.currentPadBank}
+          power={this.state.power}
+          updateDisplay={this.displayClipName}
+        />
+
+        <div className='logo'>
+          <div className='inner-logo '>{'FCC' + String.fromCharCode(160)}</div>
+          <i className='inner-logo fa fa-free-code-camp' />
+        </div>
+
+        <div className='controls-container'>
+          <div className='control'>
+            <p>Power</p>
+            <div className='select' onClick={this.powerControl}>
+              <div className='inner' style={powerSlider} />
+            </div>
+          </div>
+          <p id='display'>{this.state.display}</p>
+          <div className='volume-slider'>
+            <input
+              max='1'
+              min='0'
+              onChange={this.adjustVolume}
+              step='0.01'
+              type='range'
+              value={this.state.sliderVal}
+            />
+          </div>
+          <div className='control'>
+            <p>Bank</p>
+            <div className='select' onClick={this.selectBank}>
+              <div className='inner' style={bankSlider} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default App
